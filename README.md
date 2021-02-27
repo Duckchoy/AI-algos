@@ -5,27 +5,27 @@ Each algorithm has its own file with the same class name. Most of the mathematic
 The algorithms coded here are organized in the following manner (directory/filename)
 
 ```
-                                              Supervised Learning
-                                                       │   
-                                              _________|_________
-                                              |                 |
-                                      Classification        Regression
-                                       |- Naive Bayes        |- Linear Reg.
-                                       |- Logistic Reg       |- Random Forest
-                                       |- Decision Tree
-                                       |- K-nearest neighbor
-                                       |- Support Vector Machine
+                                        Supervised Learning
+                                                 │   
+                                        _________|_________
+                                        |                 |
+                                Classification        Regression
+                                 |- Naive Bayes        |- Linear Reg.
+                                 |- Logistic Reg       |- Random Forest
+                                 |- Decision Tree
+                                 |- K-nearest neighbor
+                                 |- Support Vector Machine
 ```
 
 ```
-                                             Unsupervised Learning
-                                                       │   
-                                              _________|_________
-                                              |                 |
-                                      Clustering          Dimension Reduction  
-                                      |- K-means             |- Principal Component Analysis
-                                      |- K-modes             |- Discriminant Analysis
-                                      |- Hierarchical 
+                                       Unsupervised Learning
+                                                 │   
+                                        _________|_________
+                                        |                 |
+                                Clustering          Dimension Reduction  
+                                |- K-means             |- Principal Component Analysis
+                                |- K-modes             |- Discriminant Analysis
+                                |- Hierarchical 
 ```
 
 ---
