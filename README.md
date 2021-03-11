@@ -28,5 +28,7 @@ The algorithms coded here are organized in the following manner (directory/filen
                                 |- Hierarchical 
 ```
 
+There are a few deep learning algorithms as well. E.g., simple (shallow) neural network. I will add more notebooks soon.
+
 ---
-Note: These files are for educational purposes only and can be copied, used for free. Bulk of these files were already posted [here](https://www.kaggle.com/milan400/machine-learning-algorithms-from-scratch/notebook) on Kaggle. I will continue adding more algorithms with time.
+Note: These files are for educational purposes only and can be copied, used for free. Some of these files were already posted [here](https://www.kaggle.com/milan400/machine-learning-algorithms-from-scratch/notebook) on Kaggle. I will continue adding more algorithms with time.
