@@ -4,7 +4,7 @@ import numpy as np
 class NeuralNetwork:
     """
     This is a simple 2 layer neural network. It has 1 input layer with nx number
-    of features, and a hidden layer with nh number of hidden units (nodes). The
+    of features, and one hidden layer with nh number of hidden units (nodes). The
     output layer has ny units (each containing 2 classes).
     The neural network is trained in the following manner
         (1) Initialization: the parameters (weights, biases) by random variables
@@ -29,7 +29,7 @@ class NeuralNetwork:
     def __init__(self,
                  learn_rate=0.001,
                  max_iter=1000,
-                 hidden_layers=4,
+                 hidden_units=4,
                  seed=42,
                  feature_axis=0,
                  activation='tanh',
@@ -39,7 +39,7 @@ class NeuralNetwork:
         # Hyper-parameters
         self.lr = learn_rate                # (float) learning rate
         self.max_iter = max_iter            # (int) max number of iterations in optimization
-        self.nh = hidden_layers             # (int) number of hidden layers
+        self.nh = hidden_units              # (int) number of nodes in the hidden layer
         self.seed = seed                    # (int) fix the random state
         self.feature_axis = feature_axis    # (0, 1) the features are in a row (0) or a column (1)
         self.print_cost = print_cost        # (bool) prints the cost (cross-entropy) function
@@ -197,7 +197,7 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
     nn = NeuralNetwork(
-        learn_rate=0.5, max_iter=10000, hidden_layers=5, seed=2,
+        learn_rate=0.5, max_iter=10000, hidden_units=5, seed=2,
         activation='tanh', print_cost=True
         )
 
@@ -229,7 +229,7 @@ if __name__ == "__main__":
     # plt.show()
     #
     # nn = NeuralNetwork(
-    #     learn_rate=0.5, max_iter=1000, hidden_layers=5, seed=2,
+    #     learn_rate=0.5, max_iter=1000, hidden_units=5, seed=2,
     #     feature_axis=1, activation='tanh', print_cost=True
     #     )
     #
@@ -242,3 +242,4 @@ if __name__ == "__main__":
     #
     # y_test_hat = nn.predict_class(X_test)
     # print("Test Accuracy: ", accuracy(y_test, y_test_hat))
+    
