@@ -14,10 +14,10 @@ The algorithms coded here are organized in the following manner (directory/filen
                                         |                 |
                                 Classification        Regression
                                  |- Naive Bayes        |- Linear Reg.
-                                 |- Logistic Reg       |- Random Forest
+                                 |- Logistic Reg.      |- Random Forest
                                  |- Decision Tree
                                  |- K-nearest neighbor
-                                 |- Support Vector Machine
+                                 |- Support Vector Classifier
 ```
 
 ```
@@ -25,7 +25,7 @@ The algorithms coded here are organized in the following manner (directory/filen
                                                  │   
                                         _________|_________
                                         |                 |
-                                Clustering          Dimension Reduction  
+                                Clustering            Dimension Reduction  
                                 |- K-means             |- Principal Component Analysis
                                 |- K-modes             |- Discriminant Analysis
                                 |- Hierarchical 
