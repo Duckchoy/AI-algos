@@ -33,7 +33,7 @@ The algorithms coded here are organized in the following manner (directory/filen
 
 ## Deep learning algorithms from scratch
 
-There is a simple (shallow) neural network and a deep L-layer network. Helper functions, such as activation functions, cross-entropy formula etc., are in the utils.py file. 
+There is a simple (shallow) neural network and a deep L-layer network. Helper functions, such as activation functions, cross-entropy formula etc., are in the utils.py file. We will also implement a simple covolutional neural network (CNN), and a recurrent neural network (RNN).
 
 ---
 Note: These files are for educational purposes only and can be copied, used for free. Some of the files in the ML section were already posted [here](https://www.kaggle.com/milan400/machine-learning-algorithms-from-scratch/notebook) on Kaggle. I will continue adding more algorithms with time.
