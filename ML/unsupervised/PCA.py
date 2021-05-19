@@ -95,11 +95,11 @@ class PCA:
 # Driver code
 if __name__ == '__main__':
     from sklearn import datasets
-    import matplotlib.pyplot as plt
-    
+
     # local needs, can be turned off
-    import matplotlib
-    matplotlib.use('Qt5Agg')
+    # import matplotlib
+    # matplotlib.use('Qt5Agg')
+    import matplotlib.pyplot as plt
 
     data = datasets.load_iris()
     # has rows = data, cols = features (hence, axis=1)
