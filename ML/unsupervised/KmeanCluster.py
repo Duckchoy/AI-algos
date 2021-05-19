@@ -49,13 +49,13 @@ class KMeans:
 
         self.centroids = np.array([])
         self.classifications = np.array([])
-        self.n_features = 0
+        self.cost = []
         self.n_examples = 0
 
-    def init_centroids(self, X):
+    def _init_centroids(self, X):
         # Initialize the centroids. For the zeroth iteration, they are medoids.
 
-        self.n_examples, self.n_features = X.shape
+        self.n_examples, n_features = X.shape
 
         # The number of clusters should not exceed the number of data points.
         if self.n_examples < self.k:
@@ -74,13 +74,13 @@ class KMeans:
         if self.verbose:
             print("The initial choice of centroids are:")
             for k in range(self.k):
-                print(f"Centroid {1 + k}: {self.centroids[k]}")
+                print(f"Centroid {1+k}: {self.centroids[k]}")
 
     @staticmethod
     def _dist_from_centroids(centroids, X):
         """
-        A helper function that computes the distance of a point in X, from a centroid
-        in the list 'centroids'.
+        A helper function that computes the distance of a point in X, from all the
+        centroids in the list of 'centroids'.
 
         Parameters
         ----------
@@ -92,11 +92,11 @@ class KMeans:
         dist_matrix : ndarray of shape (n_examples, n_clusters)
         """
         dist_matrix = []
-        # Making use of Numpy's broadcasting, the distances of each data
+        # Making use of broadcasting of Numpy, the distances of each data
         # from the centroids are obtained in a matrix: n_examples x n_clusters
 
         for centroid in centroids:
-            dist_matrix.append(np.linalg.norm(X - centroid, axis=1, ord=2))
+            dist_matrix.append(np.linalg.norm(X-centroid, axis=1, ord=2))
 
         # The numpy L2-distance matrix
         dist_matrix = np.asarray(dist_matrix).T
@@ -114,7 +114,7 @@ class KMeans:
         self.classifications = np.argmin(dist_matrix, axis=1)
 
     @staticmethod
-    def get_centroids(cluster_labels, X):
+    def _get_centroids(cluster_labels, X):
         """
         A helper function to compute a new set of centroids for a given cluster label.
         The new centroids are simply the arithmetic mean of all the data points with the
@@ -146,9 +146,21 @@ class KMeans:
             # Note, np.bincount works only for integer labels (hence, the assertion above)
 
         # Obtain the mean by dividing the summations with the population of each cluster.
-        new_centroids = np.asarray(new_centroids / counts)
+        new_centroids = np.asarray(new_centroids/counts)
 
         return new_centroids.T
+
+    def cost_func(self, X):
+        # Cost function of a particular cluster assignment is the mean of the
+        # L2-distances of each point in the sample, from its assigned centroid.
+
+        cost_ = 0
+        for idx in range(self.n_examples):
+            distance = X[idx] - self.centroids[self.classifications[idx]]
+            cost_ += np.linalg.norm(distance, axis=0, ord=2)
+
+        # Returns a self object (float).
+        return cost_ / self.n_examples
 
     def fit(self, X):
         """ Compute k-means clustering.
@@ -161,18 +173,26 @@ class KMeans:
         """
 
         # Initialize the centroids
-        self.init_centroids(X)
+        self._init_centroids(X)
+
+        # Convergence check flag
+        optimized = False
 
         for itr in range(1, self.max_iter):
             prev_centroids = self.centroids
             self._assign_clusters(X)
 
+            # Cost function of the cluster assignment
+            cost_itr = self.cost_func(X)
+            self.cost += [cost_itr]
+
             if self.verbose:
                 print("\niteration: ", itr, '\n--------------')
                 print("centers:\n", self.centroids)
                 print("cluster labels:\n", self.classifications)
+                print("Cost of clustering:", round(cost_itr, 3))
 
-            self.centroids = self.get_centroids(self.classifications, X)
+            self.centroids = self._get_centroids(self.classifications, X)
             curr_centroids = self.centroids
 
             # If the new centroid does not move much from the previous one then
@@ -180,7 +200,7 @@ class KMeans:
             optimized = np.sum(np.linalg.norm(curr_centroids - prev_centroids,
                                               axis=1, ord=2)) < self.tol
             if optimized:
-                print("\nConvergence is achieved at iteration", itr)
+                print(f"\nConvergence is achieved ({self.k} clusters) at iteration {itr}.\n")
                 break
 
         if not optimized:
@@ -191,26 +211,86 @@ class KMeans:
         self._assign_clusters(X)
 
 
+def elbow_test(X, k_range_):
+    """Elbow testing of k-means algorithm.
+    Find the k for which the cost dips the most.
+
+    Parameters
+    ----------
+    X : ndarray of shape (n_examples, n_features)
+
+    k_range_ : list of k-values for testing
+
+    Returns
+    -------
+    optimal_k_ : float
+        The optimal value of the number of clusters.
+
+    elbow_ : dict of values {k-value : optimized cost}
+
+    elbow_diff_ : dict of values {k-value : grad(cost)}
+
+    """
+
+    elbow_, elbow_diff_ = {}, {}
+
+    for k_ in k_range_:
+        model_ = KMeans(n_clusters=k_, init='random', seed_=43, max_iter=300, verbose=0)
+        model_.fit(X)
+        elbow_[k_] = model_.cost[-1]
+
+        if k_ > 2:
+            elbow_diff_[k_] = 1 - elbow_[k_ - 1] / elbow_[k_]
+
+    optimal_k_ = min(elbow_diff_, key=elbow_diff_.get)
+
+    print("Optimal number of clusters is ", optimal_k_)
+
+    return optimal_k_, elbow_, elbow_diff_
+
+
+# ----- Driver code ----- #
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
     from sklearn.datasets import make_blobs
 
-    # Dataset for testing
-    X, y = make_blobs(n_samples=1500, random_state=170)
+    # Dataset for testing (play with sample size and random_state)
+    X, y = make_blobs(n_samples=150, random_state=1)
+
+    p1 = plt.figure(1)
     plt.scatter(X[:, 0], X[:, 1], c=y)
-    plt.show()
+    # plt.show()
 
     # # Dataset for debugging
     # X = np.array([[1, 2], [1.5, 1.8], [5, 8 ], [8, 8], [1, 0.6], [9, 11]])
     # plt.scatter(X[:,0], X[:,1])
     # plt.show()
 
-    model = KMeans(n_clusters=3, init='random', seed_=45, max_iter=100)
+    # ------
+    # Perform an "elbow test" to get the optimal value of cluster number
+    k_range = range(2,10)
+    optimal_k, elbow, elbow_diff = elbow_test(X, k_range)
 
+    p2 = plt.figure(2)
+    plt.plot(elbow.keys(), elbow.values(), marker='o', color='c', linestyle='--')
+    plt.plot(elbow_diff.keys(), elbow_diff.values(), color='b', linestyle='-.')
+    plt.title("Elbow test of k-means algorithm")
+    plt.ylabel("Clustering cost (J)")
+    plt.xlabel("Number of clusters (k)")
+    plt.legend(['J', 'grad(J)'])
+    plt.text(x=k_range[len(k_range)//2], y=max(elbow.values()),
+             s = f"Optimal k={optimal_k}", va='top', ha='right')
+    # plt.show()
+    # -----
+
+    # k-means may get stuck sometimes, change the seed_ parameter to choose different
+    # set of initial centroids.
+    model = KMeans(n_clusters=3, init='random', seed_=42, max_iter=300, verbose=1)
     model.fit(X)
 
     colors = 10 * ["g", "r", "c", "b", "k"]
 
+    p3 = plt.figure(3)
     for m in range(model.n_examples):
         label_ = model.classifications[m]
         color = colors[label_]
