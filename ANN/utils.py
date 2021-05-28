@@ -1,11 +1,17 @@
-# Regularization
+# Activate
+#   |- Linear
+#   |- ReLU
+#   |- Sigmoid
+#   |- Softmax
+#   |- Tanh
+# Regularize
 #   |- L2
 #   |- Dropout
-# Initialization (variance)
+# Initialize (variance)
 #   |- Constant
 #   |- He
 #   |- Xavier
-# Optimizers
+# Optimize
 #   |- EMA
 #   |- RMSprop
 #   |- Adam
@@ -15,6 +21,95 @@
 import numpy as np
 import gc
 import matplotlib.pyplot as plt
+
+
+class Activate:
+    """
+    Following activation functions are defined under this class
+    (1) Linear
+    (2) ReLU (Rectified Linear Unit)
+    (3) Sigmoid
+    (4) Softmax
+    (5) Tanh (Hyperbolic tangent)
+    """
+
+    def linear(self, x):
+        """
+        Linear activation function (pass-through).
+        Returns nothing but the the input vector itself.
+        """
+        return x
+
+    def relu(self, x, max_value=None, threshold=0):
+        """
+        Rectified linear unit.
+        With default values, it returns element-wise `max(x, 0)`.
+        Otherwise:
+        `relu(x) = max_value` for `x >= max_value`,
+        `relu(x) = x` for `threshold <= x < max_value`,
+
+        Parameters
+        ----------
+        x : ndarray
+        max_value: float, default = None
+        threshold : float, default = 0
+        """
+
+        output = np.maximum(x, threshold)
+        output = np.minimum(output, max_value)
+
+        return output
+
+    def sigmoid(self, x):
+        """
+        Sigmoid activation function,
+            `sigmoid(x) = 1 / (1 + exp(-x))`.
+
+        The sigmoid function always returns a value between 0 and 1.
+
+        For example:
+            x = [-20, -1.0, 0.0, 1.0, 20]
+            output = [2.06e-09, 2.689e-01, 5.00e-01, 7.31e-01, 1.0]
+        """
+        output = 1 / (1 + np.exp(-x))
+        return output
+
+    def softmax(self, x, axis=-1):
+        """
+        Softmax converts a vector of values to a probability distribution. It can
+        be viewed as a higher-dimensional generalization of the sigmoid function.
+
+        Parameters
+        ----------
+        x : ndarray of shape ()
+        axis : int, default=-1
+            axis along which the softmax normalization is applied.
+
+        Returns
+        -------
+        output : ndarray of shape ()
+            Output of softmax transformation (all values must be non-negative
+            and sum to 1).
+        """
+
+        norm = np.sum(np.exp(x))
+        output = np.exp(x)/norm
+
+        # assert all the values are non-negative
+        assert all(output > 0)
+        # All the elements of the output vector sum to 1.
+        assert np.sum(output) == 1.0
+
+        return output
+
+    def tanh(self, x):
+        """
+        Hyperbolic tangent activation function.
+
+        Returns:
+            ndarray of same shape and dtype as those of input `x`.
+        """
+        return np.tanh(x)
 
 
 # ----- Methods useful for Convolutional Neural Networks (CNN) ---- #
@@ -53,7 +148,7 @@ def zero_pad(image, pad: int, demo=False):
 
     # Check the input format
     if len(image.shape) < 4:
-        raise ValueError("Input dimensions not consistent with (m, nh, nw, nc).")
+        raise ValueError("Input dimensions not of the form (m, nh, nw, nc).")
 
     im_pad = np.pad(image, ((0, 0), (pad, pad), (pad, pad), (0, 0)),
                     mode='constant', constant_values=(0, 0))
@@ -127,7 +222,7 @@ def conv_full(image, kernel, bias, stride, pad, demo=False):
     for i in range(m):  # loop over the training examples
         im_i = image[i, :, :, :]
 
-        for h in range(nh):    # loop over the vertical axis of the matrix
+        for h in range(nh):  # loop over the vertical axis of the matrix
             top = h * stride
             bottom = top + f
 
@@ -149,7 +244,7 @@ def conv_full(image, kernel, bias, stride, pad, demo=False):
     if demo:
         fig, ax = plt.subplots(1, 2)
         ax[0].set_title('Original Image (%ix%ix%i)'
-                        % (nh_prev+2*pad, nw_prev+2*pad, nc_prev))
+                        % (nh_prev + 2 * pad, nw_prev + 2 * pad, nc_prev))
         ax[0].imshow(image[0, :, :, 0])
         ax[1].set_title('Convolved Image (%ix%ix%i)' % (nh, nw, nc))
         ax[1].imshow(im_out[0, :, :, 0])
@@ -196,7 +291,7 @@ def pooling(image, f: int, stride: int, mode='max', demo=False):
     for i in range(m):  # loop over the training examples
         im_i = image[i, :, :, :]
 
-        for h in range(nh):    # loop over the vertical axis of the matrix
+        for h in range(nh):  # loop over the vertical axis of the matrix
             top = h * stride
             bottom = top + f
 
@@ -230,7 +325,6 @@ def pooling(image, f: int, stride: int, mode='max', demo=False):
     gc.collect()
 
     return im_out
-
 
 # def forward_prop(self, X):
 #   CONV2D -> RELU -> MAX_POOL -> CONV2D -> RELU -> MAX_POOL -> FLATTEN -> FULLY_CONNECTED

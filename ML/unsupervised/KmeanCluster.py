@@ -28,8 +28,8 @@ class KMeans:
 
     Notes
     -----
-    The average complexity of k-means is O(k m T), where m is the number of examples
-    and T is the number of iterations.
+    The average complexity of k-means is O(k m T), where 'm' is the number of examples
+    and 'T' is the number of iterations.
 
     The steps involved are the following:
         1. Assign (randomly/first k) data points as centroids (centroid initialization)
